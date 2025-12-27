@@ -1,0 +1,881 @@
+# ItemSmelter Configuration
+# Full configuration for armor, tools, and minecart smelting in blast furnaces
+# TODO maked in 1.1.2 diamonds items cant burn in blast_furnace and usage default furnace
+# cant fix because ebal.
+# Language: en_us (English), sru_sru (Russian) or ua_uk (Ukraine)
+language: en_us
+
+# Default items configuration
+default_items:
+  # === DIAMOND ARMOR ===
+  diamond_helmet:
+    material: DIAMOND_HELMET
+    enabled: true
+    smelt_in: FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: DIAMOND
+    max_durability: 363
+    durability_ranges:
+      "100":
+        min: 5
+        max: 5
+      "75":
+        min: 3
+        max: 4
+      "50":
+        min: 2
+        max: 3
+      "25":
+        min: 0
+        max: 2
+    smelt_time_multiplier: 3.0
+
+  diamond_chestplate:
+    material: DIAMOND_CHESTPLATE
+    enabled: true
+    smelt_in: FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: DIAMOND
+    max_durability: 528
+    durability_ranges:
+      "100":
+        min: 8
+        max: 8
+      "75":
+        min: 5
+        max: 7
+      "50":
+        min: 3
+        max: 5
+      "25":
+        min: 0
+        max: 3
+    smelt_time_multiplier: 3.0
+
+  diamond_leggings:
+    material: DIAMOND_LEGGINGS
+    enabled: true
+    smelt_in: FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: DIAMOND
+    max_durability: 495
+    durability_ranges:
+      "100":
+        min: 7
+        max: 7
+      "75":
+        min: 4
+        max: 6
+      "50":
+        min: 3
+        max: 5
+      "25":
+        min: 0
+        max: 3
+    smelt_time_multiplier: 3.0
+
+  diamond_boots:
+    material: DIAMOND_BOOTS
+    enabled: true
+    smelt_in: FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: DIAMOND
+    max_durability: 429
+    durability_ranges:
+      "100":
+        min: 4
+        max: 4
+      "75":
+        min: 2
+        max: 3
+      "50":
+        min: 1
+        max: 2
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 3.0
+
+  # === DIAMOND TOOLS ===
+  diamond_sword:
+    material: DIAMOND_SWORD
+    enabled: true
+    smelt_in: FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: DIAMOND
+    max_durability: 1561
+    durability_ranges:
+      "100":
+        min: 2
+        max: 2
+      "75":
+        min: 1
+        max: 2
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 3.0
+
+  diamond_pickaxe:
+    material: DIAMOND_PICKAXE
+    enabled: true
+    smelt_in: FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: DIAMOND
+    max_durability: 1561
+    durability_ranges:
+      "100":
+        min: 3
+        max: 3
+      "75":
+        min: 2
+        max: 2
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 3.0
+
+  diamond_axe:
+    material: DIAMOND_AXE
+    enabled: true
+    smelt_in: FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: DIAMOND
+    max_durability: 1561
+    durability_ranges:
+      "100":
+        min: 3
+        max: 3
+      "75":
+        min: 2
+        max: 2
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 3.0
+
+  diamond_shovel:
+    material: DIAMOND_SHOVEL
+    enabled: true
+    smelt_in: FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: DIAMOND
+    max_durability: 1561
+    durability_ranges:
+      "100":
+        min: 1
+        max: 1
+      "75":
+        min: 1
+        max: 1
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 0
+    smelt_time_multiplier: 3.0
+
+  diamond_hoe:
+    material: DIAMOND_HOE
+    enabled: true
+    smelt_in: FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: DIAMOND
+    max_durability: 1561
+    durability_ranges:
+      "100":
+        min: 2
+        max: 2
+      "75":
+        min: 1
+        max: 2
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 3.0
+
+  # === IRON ARMOR ===
+  iron_helmet:
+    material: IRON_HELMET
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: IRON_INGOT
+    max_durability: 165
+    durability_ranges:
+      "100":
+        min: 5
+        max: 5
+      "75":
+        min: 3
+        max: 4
+      "50":
+        min: 2
+        max: 3
+      "25":
+        min: 0
+        max: 2
+    smelt_time_multiplier: 2.0
+
+  iron_chestplate:
+    material: IRON_CHESTPLATE
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: IRON_INGOT
+    max_durability: 240
+    durability_ranges:
+      "100":
+        min: 8
+        max: 8
+      "75":
+        min: 5
+        max: 7
+      "50":
+        min: 3
+        max: 5
+      "25":
+        min: 0
+        max: 3
+    smelt_time_multiplier: 2.0
+
+  iron_leggings:
+    material: IRON_LEGGINGS
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: IRON_INGOT
+    max_durability: 225
+    durability_ranges:
+      "100":
+        min: 7
+        max: 7
+      "75":
+        min: 4
+        max: 6
+      "50":
+        min: 3
+        max: 5
+      "25":
+        min: 0
+        max: 3
+    smelt_time_multiplier: 2.0
+
+  iron_boots:
+    material: IRON_BOOTS
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: IRON_INGOT
+    max_durability: 195
+    durability_ranges:
+      "100":
+        min: 4
+        max: 4
+      "75":
+        min: 2
+        max: 3
+      "50":
+        min: 1
+        max: 2
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 2.0
+
+  # === IRON TOOLS ===
+  iron_sword:
+    material: IRON_SWORD
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: IRON_INGOT
+    max_durability: 250
+    durability_ranges:
+      "100":
+        min: 2
+        max: 2
+      "75":
+        min: 1
+        max: 2
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 2.0
+
+  iron_pickaxe:
+    material: IRON_PICKAXE
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: IRON_INGOT
+    max_durability: 250
+    durability_ranges:
+      "100":
+        min: 2
+        max: 3
+      "75":
+        min: 1
+        max: 2
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 2.0
+
+  iron_axe:
+    material: IRON_AXE
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: IRON_INGOT
+    max_durability: 250
+    durability_ranges:
+      "100":
+        min: 2
+        max: 3
+      "75":
+        min: 1
+        max: 2
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 2.0
+
+  iron_shovel:
+    material: IRON_SHOVEL
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: IRON_INGOT
+    max_durability: 250
+    durability_ranges:
+      "100":
+        min: 1
+        max: 1
+      "75":
+        min: 1
+        max: 1
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 0
+    smelt_time_multiplier: 2.0
+
+  iron_hoe:
+    material: IRON_HOE
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: IRON_INGOT
+    max_durability: 250
+    durability_ranges:
+      "100":
+        min: 2
+        max: 2
+      "75":
+        min: 1
+        max: 2
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 2.0
+
+  # === GOLDEN ARMOR ===
+  golden_helmet:
+    material: GOLDEN_HELMET
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: GOLD_INGOT
+    max_durability: 77
+    durability_ranges:
+      "100":
+        min: 5
+        max: 5
+      "75":
+        min: 3
+        max: 4
+      "50":
+        min: 2
+        max: 3
+      "25":
+        min: 0
+        max: 2
+    smelt_time_multiplier: 2.5
+
+  golden_chestplate:
+    material: GOLDEN_CHESTPLATE
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: GOLD_INGOT
+    max_durability: 112
+    durability_ranges:
+      "100":
+        min: 8
+        max: 8
+      "75":
+        min: 5
+        max: 7
+      "50":
+        min: 3
+        max: 5
+      "25":
+        min: 0
+        max: 3
+    smelt_time_multiplier: 2.5
+
+  golden_leggings:
+    material: GOLDEN_LEGGINGS
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: GOLD_INGOT
+    max_durability: 105
+    durability_ranges:
+      "100":
+        min: 6
+        max: 7
+      "75":
+        min: 4
+        max: 6
+      "50":
+        min: 3
+        max: 5
+      "25":
+        min: 0
+        max: 3
+    smelt_time_multiplier: 2.5
+
+  golden_boots:
+    material: GOLDEN_BOOTS
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: GOLD_INGOT
+    max_durability: 91
+    durability_ranges:
+      "100":
+        min: 4
+        max: 4
+      "75":
+        min: 2
+        max: 3
+      "50":
+        min: 1
+        max: 2
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 2.5
+
+  # === GOLDEN TOOLS ===
+  golden_sword:
+    material: GOLDEN_SWORD
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: GOLD_INGOT
+    max_durability: 32
+    durability_ranges:
+      "100":
+        min: 2
+        max: 2
+      "75":
+        min: 1
+        max: 2
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 2.5
+
+  golden_pickaxe:
+    material: GOLDEN_PICKAXE
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: GOLD_INGOT
+    max_durability: 32
+    durability_ranges:
+      "100":
+        min: 2
+        max: 3
+      "75":
+        min: 1
+        max: 2
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 2.5
+
+  golden_axe:
+    material: GOLDEN_AXE
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: GOLD_INGOT
+    max_durability: 32
+    durability_ranges:
+      "100":
+        min: 2
+        max: 3
+      "75":
+        min: 1
+        max: 2
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 2.5
+
+  golden_shovel:
+    material: GOLDEN_SHOVEL
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: GOLD_INGOT
+    max_durability: 32
+    durability_ranges:
+      "100":
+        min: 1
+        max: 1
+      "75":
+        min: 1
+        max: 1
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 2.5
+
+  golden_hoe:
+    material: GOLDEN_HOE
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: GOLD_INGOT
+    max_durability: 32
+    durability_ranges:
+      "100":
+        min: 1
+        max: 2
+      "75":
+        min: 1
+        max: 2
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 2.5
+
+  # === CHAINMAIL ARMOR ===
+  chainmail_helmet:
+    material: CHAINMAIL_HELMET
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: IRON_INGOT
+    max_durability: 165
+    durability_ranges:
+      "100":
+        min: 2
+        max: 3
+      "75":
+        min: 1
+        max: 2
+      "50":
+        min: 1
+        max: 2
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 2.0
+
+  chainmail_chestplate:
+    material: CHAINMAIL_CHESTPLATE
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: IRON_INGOT
+    max_durability: 240
+    durability_ranges:
+      "100":
+        min: 4
+        max: 5
+      "75":
+        min: 3
+        max: 4
+      "50":
+        min: 2
+        max: 3
+      "25":
+        min: 0
+        max: 2
+    smelt_time_multiplier: 2.0
+
+  chainmail_leggings:
+    material: CHAINMAIL_LEGGINGS
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: IRON_INGOT
+    max_durability: 225
+    durability_ranges:
+      "100":
+        min: 3
+        max: 4
+      "75":
+        min: 2
+        max: 3
+      "50":
+        min: 1
+        max: 2
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 2.0
+
+  chainmail_boots:
+    material: CHAINMAIL_BOOTS
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: true
+    durability_based: true
+    output:
+      material: IRON_INGOT
+    max_durability: 195
+    durability_ranges:
+      "100":
+        min: 1
+        max: 2
+      "75":
+        min: 1
+        max: 2
+      "50":
+        min: 0
+        max: 1
+      "25":
+        min: 0
+        max: 1
+    smelt_time_multiplier: 2.0
+
+  # === MINECARTS ===
+  minecart:
+    material: MINECART
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: false
+    durability_based: false
+    output:
+      material: IRON_INGOT
+    max_durability: 1
+    durability_ranges:
+      "100":
+        min: 1
+        max: 2
+    smelt_time_multiplier: 2.0
+
+  chest_minecart:
+    material: CHEST_MINECART
+    enabled: true
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: false
+    durability_based: false
+    output:
+      material: IRON_INGOT
+    max_durability: 1
+    durability_ranges:
+      "100":
+        min: 1
+        max: 2
+    smelt_time_multiplier: 2.0
+
+  furnace_minecart:
+    material: FURNACE_MINECART
+    enabled: false
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: false
+    durability_based: false
+    output:
+      material: IRON_INGOT
+    max_durability: 1
+    durability_ranges:
+      "100":
+        min: 1
+        max: 2
+    smelt_time_multiplier: 2.0
+
+  hopper_minecart:
+    material: HOPPER_MINECART
+    enabled: false
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: false
+    durability_based: false
+    output:
+      material: IRON_INGOT
+    max_durability: 1
+    durability_ranges:
+      "100":
+        min: 1
+        max: 4
+    smelt_time_multiplier: 2.0
+
+  tnt_minecart:
+    material: TNT_MINECART
+    enabled: false
+    smelt_in: BLAST_FURNACE
+    ignore_sticks: false
+    durability_based: false
+    output:
+      material: IRON_INGOT
+    max_durability: 1
+    durability_ranges:
+      "100":
+        min: 1
+        max: 2
+    smelt_time_multiplier: 2.0
+
+# Custom items - these override default items if material matches
+custom_items: {}
+  # Example custom item:
+  # my_custom_sword:
+  #   material: DIAMOND_SWORD
+  #   enabled: true
+  #   smelt_in: FURNACE
+  #   ignore_sticks: true
+  #   durability_based: true
+  #   output:
+  #     material: DIAMOND
+  #   max_durability: 1561
+  #   durability_ranges:
+  #     "100":
+  #       min: 2
+  #       max: 3
+  #     "75":
+  #       min: 1
+  #       max: 2
+  #     "50":
+  #       min: 1
+  #       max: 1
+  #     "25":
+  #       min: 0
+  #       max: 1
+#   smelt_time_multiplier: 3.0
+
+# Sound settings
+sounds:
+  # Sound when smelting succeeds
+  success: BLOCK_ANVIL_USE
+  success_volume: 0.5
+  success_pitch: 1.5
+
+  # Sound when smelting fails (0 resources)
+  failure: ENTITY_VILLAGER_NO
+  failure_volume: 1.0
+  failure_pitch: 1.0
+
+  # Available sounds: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
+  # Popular options:
+  # - ENTITY_VILLAGER_NO (villager "hmm" sound)
+  # - BLOCK_ANVIL_LAND (anvil breaking)
+  # - ENTITY_ITEM_BREAK (item breaking)
+  # - BLOCK_GLASS_BREAK (glass breaking)

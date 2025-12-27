@@ -1,0 +1,24 @@
+name: ItemSmelter
+version: '1.3.1'
+main: com.itemsmelter.ItemSmelter
+api-version: '1.21'
+authors: [ MaxEngine ]
+description: Advanced item smelting plugin for armor, tools and minecarts
+
+commands:
+  itemsmelter:
+    description: ItemSmelter main command
+    usage: /itemsmelter <reload|help|info>
+    aliases: [is, smelter]
+    permission: itemsmelter.admin
+
+permissions:
+  itemsmelter.use:
+    description: Allows using the smelting functionality
+    default: true
+  itemsmelter.admin:
+    description: Allows reloading the plugin configuration
+    default: op
+  itemsmelter.bypass:
+    description: Bypass all restrictions
+    default: op
