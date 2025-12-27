@@ -11,64 +11,66 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class RecipeManager {
 
     private final ItemSmelter plugin;
     private final List<NamespacedKey> registeredRecipes = new ArrayList<>();
+    private final List<SmeltableItem> registeredItems = new ArrayList<>();
 
     public RecipeManager(ItemSmelter plugin) {
         this.plugin = plugin;
     }
 
     public void registerRecipes() {
-        // Remove old recipes first
         removeRecipes();
+        registeredItems.clear();
 
+        int registered = 0;
         for (SmeltableItem item : plugin.getConfigManager().getAllSmeltableItems()) {
             if (!item.isEnabled()) {
                 continue;
             }
 
-            // Create a dummy result (will be replaced by our custom logic)
             ItemStack result = new ItemStack(item.getOutputMaterial(), 1);
             ItemStack source = new ItemStack(item.getMaterial(), 1);
-
             NamespacedKey key = new NamespacedKey(plugin, "smelt_" + item.getId().toLowerCase());
 
             try {
                 Recipe recipe;
-
+                
                 if ("BLAST_FURNACE".equals(item.getSmeltIn())) {
                     BlastingRecipe blastRecipe = new BlastingRecipe(
-                            key,
-                            result,
-                            source.getType(),
-                            0.1f, // experience
-                            (int) (100 * item.getSmeltTimeMultiplier()) // cook time in ticks
+                        key,
+                        result,
+                        source.getType(),
+                        0.1f,
+                        (int) (100 * item.getSmeltTimeMultiplier())
                     );
                     recipe = blastRecipe;
                 } else {
                     FurnaceRecipe furnaceRecipe = new FurnaceRecipe(
-                            key,
-                            result,
-                            source.getType(),
-                            0.1f,
-                            (int) (200 * item.getSmeltTimeMultiplier())
+                        key,
+                        result,
+                        source.getType(),
+                        0.1f,
+                        (int) (200 * item.getSmeltTimeMultiplier())
                     );
                     recipe = furnaceRecipe;
                 }
 
                 Bukkit.addRecipe(recipe);
                 registeredRecipes.add(key);
-                plugin.getLogger().info("Registered recipe for: " + item.getId());
-
+                registeredItems.add(item);
+                registered++;
+                
             } catch (Exception e) {
                 plugin.getLogger().warning("Failed to register recipe for " + item.getId() + ": " + e.getMessage());
             }
         }
+        
+        plugin.getLogger().info("Registered " + registered + " recipe(s)");
     }
 
     public void removeRecipes() {
@@ -76,6 +78,14 @@ public class RecipeManager {
             Bukkit.removeRecipe(key);
         }
         registeredRecipes.clear();
+    }
+
+    public List<SmeltableItem> getRegisteredItems() {
+        return new ArrayList<>(registeredItems);
+    }
+
+    public int getRegisteredCount() {
+        return registeredItems.size();
     }
 
     public void cleanup() {
