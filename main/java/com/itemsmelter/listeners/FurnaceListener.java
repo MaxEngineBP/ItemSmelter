@@ -27,7 +27,7 @@ public class FurnaceListener implements Listener {
     private final ItemSmelter plugin;
     private final SmeltingManager smeltingManager;
     private final Map<Location, Long> lastSmelt = new HashMap<>();
-    private final Set<Location> failedLocations = new HashSet<>();
+    private final Set<Location> processingFailure = new HashSet<>();
 
     public FurnaceListener(ItemSmelter plugin) {
         this.plugin = plugin;
@@ -38,7 +38,7 @@ public class FurnaceListener implements Listener {
     public void onFurnaceBurn(FurnaceBurnEvent event) {
         boolean isBlastFurnace = event.getBlock().getState() instanceof BlastFurnace;
         boolean isFurnace = event.getBlock().getState() instanceof Furnace;
-
+        
         if (!isBlastFurnace && !isFurnace) {
             return;
         }
@@ -79,13 +79,19 @@ public class FurnaceListener implements Listener {
 
         boolean isBlastFurnace = event.getBlock().getState() instanceof BlastFurnace;
         boolean isFurnace = event.getBlock().getState() instanceof Furnace && !(event.getBlock().getState() instanceof BlastFurnace);
-
+        
         if (!isBlastFurnace && !isFurnace) {
             return;
         }
 
         Location location = event.getBlock().getLocation();
-
+        
+        // Skip if already processing failure
+        if (processingFailure.contains(location)) {
+            event.setCancelled(true);
+            return;
+        }
+        
         // Prevent duplicate processing
         long now = System.currentTimeMillis();
         Long last = lastSmelt.get(location);
@@ -115,92 +121,102 @@ public class FurnaceListener implements Listener {
 
         // Calculate output
         int outputAmount = smeltingManager.calculateOutputAmount(source, smeltableItem);
-
+        
+        plugin.getLogger().info("Smelting " + source.getType() + " - Output: " + outputAmount + " (durability: " + 
+            (source.getItemMeta() instanceof org.bukkit.inventory.meta.Damageable ? 
+            ((org.bukkit.inventory.meta.Damageable)source.getItemMeta()).getDamage() : "N/A") + ")");
+        
         if (outputAmount <= 0) {
-            // FAILURE - Cancel and remove item
+            // FAILURE - Set result to AIR and remove item
             event.setCancelled(true);
-            failedLocations.add(location);
-
-            // Immediate removal
+            processingFailure.add(location);
+            
+            // Schedule removal on next tick
             Bukkit.getScheduler().runTask(plugin, () -> {
-                removeFailedItem(location);
+                handleFailedSmelting(location);
             });
-
+            
             return;
         }
 
         // SUCCESS - Set custom result
         ItemStack customResult = new ItemStack(smeltableItem.getOutputMaterial(), outputAmount);
         event.setResult(customResult);
-
+        
         Bukkit.getScheduler().runTask(plugin, () -> {
             playSound(location, "success");
         });
-
+        
         smeltingManager.completeSmelting(location);
     }
 
-    private void removeFailedItem(Location location) {
-        if (!failedLocations.contains(location)) {
-            return;
-        }
-
+    private void handleFailedSmelting(Location location) {
         if (!(location.getBlock().getState() instanceof Furnace)) {
-            failedLocations.remove(location);
+            processingFailure.remove(location);
             return;
         }
-
+        
         Furnace furnace = (Furnace) location.getBlock().getState();
         FurnaceInventory inv = furnace.getInventory();
-
+        
         ItemStack smelting = inv.getSmelting();
-
+        
         if (smelting != null && smelting.getType() != Material.AIR) {
-            // Remove one item
+            // Remove one item from stack
             if (smelting.getAmount() > 1) {
                 smelting.setAmount(smelting.getAmount() - 1);
                 inv.setSmelting(smelting);
             } else {
                 inv.setSmelting(null);
             }
-
-            // Stop all smelting processes
+            
+            // ВАЖНО: Сбрасываем только cookTime, НЕ трогаем burnTime (топливо)!
             furnace.setCookTime((short) 0);
-            furnace.setCookTimeTotal((short) 200);
-            furnace.setBurnTime((short) 0);
-
-            // Update furnace
+            
+            // Update furnace state
             furnace.update(true, false);
-
+            
+            plugin.getLogger().info("Removed failed smelting item at " + location);
+            
             // Play failure sound
             playSound(location, "failure");
-
-            // Double-check after a tick
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                if (location.getBlock().getState() instanceof Furnace) {
-                    Furnace f = (Furnace) location.getBlock().getState();
-                    f.setCookTime((short) 0);
-                    f.update(true, false);
-                }
-                failedLocations.remove(location);
-            }, 2L);
-        } else {
-            failedLocations.remove(location);
         }
-
+        
+        // Clean up and allow next smelting
+        processingFailure.remove(location);
         smeltingManager.completeSmelting(location);
+        
+        // Force update after 1 tick to ensure item is gone
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (location.getBlock().getState() instanceof Furnace) {
+                Furnace f = (Furnace) location.getBlock().getState();
+                
+                // If item is still there somehow, force remove it
+                ItemStack stillThere = f.getInventory().getSmelting();
+                if (stillThere != null && stillThere.getType() != Material.AIR) {
+                    SmeltableItem check = smeltingManager.getSmeltableItem(stillThere);
+                    if (check != null) {
+                        // This is still a custom item that failed - remove it
+                        f.getInventory().setSmelting(null);
+                        f.setCookTime((short) 0);
+                        f.update(true, false);
+                        plugin.getLogger().warning("Force removed stuck item at " + location);
+                    }
+                }
+            }
+        }, 1L);
     }
 
     private void playSound(Location location, String type) {
         String soundName = plugin.getConfig().getString("sounds." + type, "BLOCK_ANVIL_USE");
         float volume = (float) plugin.getConfig().getDouble("sounds." + type + "_volume", 0.5);
         float pitch = (float) plugin.getConfig().getDouble("sounds." + type + "_pitch", 1.0);
-
+        
         try {
             Sound sound = Sound.valueOf(soundName);
             for (Player player : Bukkit.getOnlinePlayers()) {
-                if (player.getWorld().equals(location.getWorld()) &&
-                        player.getLocation().distance(location) <= 16) {
+                if (player.getWorld().equals(location.getWorld()) && 
+                    player.getLocation().distance(location) <= 16) {
                     if (plugin.getPlayerSettingsManager().isSoundEnabled(player)) {
                         player.playSound(location, sound, volume, pitch);
                     }
@@ -218,8 +234,7 @@ public class FurnaceListener implements Listener {
         }
 
         Player player = (Player) event.getWhoClicked();
-
-        // Check if the TOP inventory is a furnace
+        
         if (!(event.getView().getTopInventory().getHolder() instanceof Furnace)) {
             return;
         }
@@ -228,22 +243,20 @@ public class FurnaceListener implements Listener {
         boolean isFurnace = event.getView().getTopInventory().getHolder() instanceof Furnace && !isBlastFurnace;
 
         // Handle shift-click from player inventory
-        if (event.isShiftClick() && event.getClickedInventory() != null &&
-                event.getClickedInventory().getHolder() == player) {
-
+        if (event.isShiftClick() && event.getClickedInventory() != null && 
+            event.getClickedInventory().getHolder() == player) {
+            
             ItemStack clicked = event.getCurrentItem();
             if (clicked != null && clicked.getType() != Material.AIR) {
                 SmeltableItem smeltableItem = smeltingManager.getSmeltableItem(clicked);
-
+                
                 if (smeltableItem != null) {
-                    // Check permission
                     if (!player.hasPermission("itemsmelter.use") && !player.hasPermission("itemsmelter.bypass")) {
                         event.setCancelled(true);
                         player.sendMessage(plugin.getLocaleManager().getMessage(player.getUniqueId(), "no_permission"));
                         return;
                     }
-
-                    // Check furnace type
+                    
                     String requiredFurnace = smeltableItem.getSmeltIn();
                     if ("BLAST_FURNACE".equals(requiredFurnace) && !isBlastFurnace) {
                         event.setCancelled(true);
@@ -256,26 +269,24 @@ public class FurnaceListener implements Listener {
                 }
             }
         }
-
+        
         // Handle direct click on smelting slot
-        if (event.getClickedInventory() != null &&
-                event.getClickedInventory().getHolder() instanceof Furnace &&
-                event.getSlot() == 0) {
-
+        if (event.getClickedInventory() != null && 
+            event.getClickedInventory().getHolder() instanceof Furnace && 
+            event.getSlot() == 0) {
+            
             ItemStack cursor = event.getCursor();
-
+            
             if (cursor != null && cursor.getType() != Material.AIR) {
                 SmeltableItem smeltableItem = smeltingManager.getSmeltableItem(cursor);
-
+                
                 if (smeltableItem != null) {
-                    // Check permission
                     if (!player.hasPermission("itemsmelter.use") && !player.hasPermission("itemsmelter.bypass")) {
                         event.setCancelled(true);
                         player.sendMessage(plugin.getLocaleManager().getMessage(player.getUniqueId(), "no_permission"));
                         return;
                     }
-
-                    // Check furnace type
+                    
                     String requiredFurnace = smeltableItem.getSmeltIn();
                     if ("BLAST_FURNACE".equals(requiredFurnace) && !isBlastFurnace) {
                         event.setCancelled(true);
@@ -289,7 +300,6 @@ public class FurnaceListener implements Listener {
             }
         }
 
-        // Check permission for taking custom items
         if (!player.hasPermission("itemsmelter.use") && !player.hasPermission("itemsmelter.bypass")) {
             ItemStack current = event.getCurrentItem();
             if (current != null && smeltingManager.canSmelt(current)) {
@@ -306,7 +316,7 @@ public class FurnaceListener implements Listener {
         }
 
         Player player = (Player) event.getWhoClicked();
-
+        
         if (!(event.getView().getTopInventory().getHolder() instanceof Furnace)) {
             return;
         }
@@ -314,22 +324,19 @@ public class FurnaceListener implements Listener {
         boolean isBlastFurnace = event.getView().getTopInventory().getHolder() instanceof BlastFurnace;
         boolean isFurnace = event.getView().getTopInventory().getHolder() instanceof Furnace && !isBlastFurnace;
 
-        // Check if dragging to smelting slot (slot 0 in furnace inventory)
         if (event.getRawSlots().contains(0)) {
             ItemStack draggedItem = event.getOldCursor();
-
+            
             if (draggedItem != null && draggedItem.getType() != Material.AIR) {
                 SmeltableItem smeltableItem = smeltingManager.getSmeltableItem(draggedItem);
-
+                
                 if (smeltableItem != null) {
-                    // Check permission
                     if (!player.hasPermission("itemsmelter.use") && !player.hasPermission("itemsmelter.bypass")) {
                         event.setCancelled(true);
                         player.sendMessage(plugin.getLocaleManager().getMessage(player.getUniqueId(), "no_permission"));
                         return;
                     }
-
-                    // Check furnace type
+                    
                     String requiredFurnace = smeltableItem.getSmeltIn();
                     if ("BLAST_FURNACE".equals(requiredFurnace) && !isBlastFurnace) {
                         event.setCancelled(true);
@@ -360,9 +367,9 @@ public class FurnaceListener implements Listener {
                     smeltingManager.cancelSmelting(location);
                 }
             }
-
+            
             lastSmelt.remove(location);
-            failedLocations.remove(location);
+            processingFailure.remove(location);
         }
     }
 
