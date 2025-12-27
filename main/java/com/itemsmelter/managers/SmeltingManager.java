@@ -40,7 +40,32 @@ public class SmeltingManager {
         return plugin.getConfigManager().getSmeltableItem(item.getType());
     }
 
-    public int calculateOutputAmount(ItemStack item, SmeltableItem smeltableItem) {
+    // added debug test 1.4.4
+     public int calculateOutputAmount(ItemStack item, SmeltableItem smeltableItem) {
+            if (!smeltableItem.isDurabilityBased()) {
+                int output = smeltableItem.calculateOutput(smeltableItem.getMaxDurability());
+                plugin.getLogger().info("Non-durability item: " + item.getType() + " -> " + output);
+                return output;
+            }
+
+            if (item.getItemMeta() instanceof Damageable) {
+                Damageable damageable = (Damageable) item.getItemMeta();
+                int damage = damageable.getDamage();
+                int currentDurability = smeltableItem.getMaxDurability() - damage;
+                int output = smeltableItem.calculateOutput(currentDurability);
+
+                plugin.getLogger().info("Durability item: " + item.getType() +
+                        " | Damage: " + damage +
+                        " | Current: " + currentDurability + "/" + smeltableItem.getMaxDurability() +
+                        " | Output: " + output);
+
+                return output;
+            }
+
+            return smeltableItem.calculateOutput(smeltableItem.getMaxDurability());
+        }
+        //original code without debug
+/*    public int calculateOutputAmount(ItemStack item, SmeltableItem smeltableItem) {
         if (!smeltableItem.isDurabilityBased()) {
             return smeltableItem.calculateOutput(smeltableItem.getMaxDurability());
         }
@@ -53,7 +78,7 @@ public class SmeltingManager {
         }
 
         return smeltableItem.calculateOutput(smeltableItem.getMaxDurability());
-    }
+    }*/
 
     public void startSmelting(Location furnaceLocation, ItemStack source, SmeltableItem smeltableItem, UUID playerId) {
         // Prevent duplicate processes
