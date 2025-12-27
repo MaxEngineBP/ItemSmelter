@@ -18,14 +18,16 @@ import org.bukkit.inventory.FurnaceInventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class FurnaceListener implements Listener {
 
     private final ItemSmelter plugin;
     private final SmeltingManager smeltingManager;
     private final Map<Location, Long> lastSmelt = new HashMap<>();
-    private final Map<Location, Boolean> processingFailure = new HashMap<>();
+    private final Set<Location> failedLocations = new HashSet<>();
 
     public FurnaceListener(ItemSmelter plugin) {
         this.plugin = plugin;
@@ -87,7 +89,7 @@ public class FurnaceListener implements Listener {
         // Prevent duplicate processing
         long now = System.currentTimeMillis();
         Long last = lastSmelt.get(location);
-        if (last != null && (now - last) < 100) {
+        if (last != null && (now - last) < 150) {
             event.setCancelled(true);
             return;
         }
@@ -115,13 +117,14 @@ public class FurnaceListener implements Listener {
         int outputAmount = smeltingManager.calculateOutputAmount(source, smeltableItem);
 
         if (outputAmount <= 0) {
-            // FAILURE - Cancel event and handle manually
+            // FAILURE - Cancel and remove item
             event.setCancelled(true);
-            processingFailure.put(location, true);
+            failedLocations.add(location);
 
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                handleFailedSmelting(location);
-            }, 2L);
+            // Immediate removal
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                removeFailedItem(location);
+            });
 
             return;
         }
@@ -137,14 +140,13 @@ public class FurnaceListener implements Listener {
         smeltingManager.completeSmelting(location);
     }
 
-    private void handleFailedSmelting(Location location) {
-        if (!processingFailure.getOrDefault(location, false)) {
+    private void removeFailedItem(Location location) {
+        if (!failedLocations.contains(location)) {
             return;
         }
 
-        processingFailure.remove(location);
-
         if (!(location.getBlock().getState() instanceof Furnace)) {
+            failedLocations.remove(location);
             return;
         }
 
@@ -154,7 +156,7 @@ public class FurnaceListener implements Listener {
         ItemStack smelting = inv.getSmelting();
 
         if (smelting != null && smelting.getType() != Material.AIR) {
-            // Remove item FIRST
+            // Remove one item
             if (smelting.getAmount() > 1) {
                 smelting.setAmount(smelting.getAmount() - 1);
                 inv.setSmelting(smelting);
@@ -162,28 +164,28 @@ public class FurnaceListener implements Listener {
                 inv.setSmelting(null);
             }
 
-            // Reset timers to stop smelting
-            furnace.setCookTime((short) -1);
+            // Stop all smelting processes
+            furnace.setCookTime((short) 0);
+            furnace.setCookTimeTotal((short) 200);
             furnace.setBurnTime((short) 0);
 
-            // Force update
+            // Update furnace
             furnace.update(true, false);
 
-            // Schedule another check to ensure item is gone
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                Furnace f = (Furnace) location.getBlock().getState();
-                FurnaceInventory fInv = f.getInventory();
-                ItemStack remainingSmelting = fInv.getSmelting();
+            // Play failure sound
+            playSound(location, "failure");
 
-                if (remainingSmelting != null && remainingSmelting.getType() != Material.AIR) {
-                    fInv.setSmelting(null);
+            // Double-check after a tick
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (location.getBlock().getState() instanceof Furnace) {
+                    Furnace f = (Furnace) location.getBlock().getState();
                     f.setCookTime((short) 0);
                     f.update(true, false);
                 }
-            }, 1L);
-
-            // Play sound
-            playSound(location, "failure");
+                failedLocations.remove(location);
+            }, 2L);
+        } else {
+            failedLocations.remove(location);
         }
 
         smeltingManager.completeSmelting(location);
@@ -209,37 +211,29 @@ public class FurnaceListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryClick(InventoryClickEvent event) {
-        boolean isBlastFurnace = event.getInventory().getHolder() instanceof BlastFurnace;
-        boolean isFurnace = event.getInventory().getHolder() instanceof Furnace && !(event.getInventory().getHolder() instanceof BlastFurnace);
-
-        if (!isBlastFurnace && !isFurnace) {
-            return;
-        }
-
         if (!(event.getWhoClicked() instanceof Player)) {
             return;
         }
 
         Player player = (Player) event.getWhoClicked();
 
-        // Check if placing item in smelting slot (slot 0)
-        if (event.getSlot() == 0 || event.getRawSlot() == 0) {
-            ItemStack cursor = event.getCursor();
-            ItemStack current = event.getCurrentItem();
-            ItemStack toCheck = null;
+        // Check if the TOP inventory is a furnace
+        if (!(event.getView().getTopInventory().getHolder() instanceof Furnace)) {
+            return;
+        }
 
-            // Determine which item is being placed
-            if (cursor != null && cursor.getType() != Material.AIR) {
-                toCheck = cursor;
-            } else if (event.isShiftClick() && current != null && current.getType() != Material.AIR) {
-                // Player is shift-clicking from their inventory
-                toCheck = current;
-            }
+        boolean isBlastFurnace = event.getView().getTopInventory().getHolder() instanceof BlastFurnace;
+        boolean isFurnace = event.getView().getTopInventory().getHolder() instanceof Furnace && !isBlastFurnace;
 
-            if (toCheck != null) {
-                SmeltableItem smeltableItem = smeltingManager.getSmeltableItem(toCheck);
+        // Handle shift-click from player inventory
+        if (event.isShiftClick() && event.getClickedInventory() != null &&
+                event.getClickedInventory().getHolder() == player) {
+
+            ItemStack clicked = event.getCurrentItem();
+            if (clicked != null && clicked.getType() != Material.AIR) {
+                SmeltableItem smeltableItem = smeltingManager.getSmeltableItem(clicked);
 
                 if (smeltableItem != null) {
                     // Check permission
@@ -249,7 +243,7 @@ public class FurnaceListener implements Listener {
                         return;
                     }
 
-                    // Check furnace type matches
+                    // Check furnace type
                     String requiredFurnace = smeltableItem.getSmeltIn();
                     if ("BLAST_FURNACE".equals(requiredFurnace) && !isBlastFurnace) {
                         event.setCancelled(true);
@@ -263,7 +257,39 @@ public class FurnaceListener implements Listener {
             }
         }
 
-        // Check permission for taking items
+        // Handle direct click on smelting slot
+        if (event.getClickedInventory() != null &&
+                event.getClickedInventory().getHolder() instanceof Furnace &&
+                event.getSlot() == 0) {
+
+            ItemStack cursor = event.getCursor();
+
+            if (cursor != null && cursor.getType() != Material.AIR) {
+                SmeltableItem smeltableItem = smeltingManager.getSmeltableItem(cursor);
+
+                if (smeltableItem != null) {
+                    // Check permission
+                    if (!player.hasPermission("itemsmelter.use") && !player.hasPermission("itemsmelter.bypass")) {
+                        event.setCancelled(true);
+                        player.sendMessage(plugin.getLocaleManager().getMessage(player.getUniqueId(), "no_permission"));
+                        return;
+                    }
+
+                    // Check furnace type
+                    String requiredFurnace = smeltableItem.getSmeltIn();
+                    if ("BLAST_FURNACE".equals(requiredFurnace) && !isBlastFurnace) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                    if ("FURNACE".equals(requiredFurnace) && !isFurnace) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        }
+
+        // Check permission for taking custom items
         if (!player.hasPermission("itemsmelter.use") && !player.hasPermission("itemsmelter.bypass")) {
             ItemStack current = event.getCurrentItem();
             if (current != null && smeltingManager.canSmelt(current)) {
@@ -273,46 +299,45 @@ public class FurnaceListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryDrag(InventoryDragEvent event) {
-        boolean isBlastFurnace = event.getInventory().getHolder() instanceof BlastFurnace;
-        boolean isFurnace = event.getInventory().getHolder() instanceof Furnace && !(event.getInventory().getHolder() instanceof BlastFurnace);
-
-        if (!isBlastFurnace && !isFurnace) {
-            return;
-        }
-
         if (!(event.getWhoClicked() instanceof Player)) {
             return;
         }
 
         Player player = (Player) event.getWhoClicked();
 
-        // Check if dragging to smelting slot
-        for (int slot : event.getRawSlots()) {
-            if (slot == 0) {
-                ItemStack item = event.getNewItems().get(slot);
-                if (item != null && item.getType() != Material.AIR) {
-                    SmeltableItem smeltableItem = smeltingManager.getSmeltableItem(item);
+        if (!(event.getView().getTopInventory().getHolder() instanceof Furnace)) {
+            return;
+        }
 
-                    if (smeltableItem != null) {
-                        // Check permission
-                        if (!player.hasPermission("itemsmelter.use") && !player.hasPermission("itemsmelter.bypass")) {
-                            event.setCancelled(true);
-                            player.sendMessage(plugin.getLocaleManager().getMessage(player.getUniqueId(), "no_permission"));
-                            return;
-                        }
+        boolean isBlastFurnace = event.getView().getTopInventory().getHolder() instanceof BlastFurnace;
+        boolean isFurnace = event.getView().getTopInventory().getHolder() instanceof Furnace && !isBlastFurnace;
 
-                        // Check furnace type matches
-                        String requiredFurnace = smeltableItem.getSmeltIn();
-                        if ("BLAST_FURNACE".equals(requiredFurnace) && !isBlastFurnace) {
-                            event.setCancelled(true);
-                            return;
-                        }
-                        if ("FURNACE".equals(requiredFurnace) && !isFurnace) {
-                            event.setCancelled(true);
-                            return;
-                        }
+        // Check if dragging to smelting slot (slot 0 in furnace inventory)
+        if (event.getRawSlots().contains(0)) {
+            ItemStack draggedItem = event.getOldCursor();
+
+            if (draggedItem != null && draggedItem.getType() != Material.AIR) {
+                SmeltableItem smeltableItem = smeltingManager.getSmeltableItem(draggedItem);
+
+                if (smeltableItem != null) {
+                    // Check permission
+                    if (!player.hasPermission("itemsmelter.use") && !player.hasPermission("itemsmelter.bypass")) {
+                        event.setCancelled(true);
+                        player.sendMessage(plugin.getLocaleManager().getMessage(player.getUniqueId(), "no_permission"));
+                        return;
+                    }
+
+                    // Check furnace type
+                    String requiredFurnace = smeltableItem.getSmeltIn();
+                    if ("BLAST_FURNACE".equals(requiredFurnace) && !isBlastFurnace) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                    if ("FURNACE".equals(requiredFurnace) && !isFurnace) {
+                        event.setCancelled(true);
+                        return;
                     }
                 }
             }
@@ -321,10 +346,7 @@ public class FurnaceListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryClose(InventoryCloseEvent event) {
-        boolean isBlastFurnace = event.getInventory().getHolder() instanceof BlastFurnace;
-        boolean isFurnace = event.getInventory().getHolder() instanceof Furnace;
-
-        if (!isBlastFurnace && !isFurnace) {
+        if (!(event.getInventory().getHolder() instanceof Furnace)) {
             return;
         }
 
@@ -340,16 +362,13 @@ public class FurnaceListener implements Listener {
             }
 
             lastSmelt.remove(location);
-            processingFailure.remove(location);
+            failedLocations.remove(location);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onFurnaceExtract(FurnaceExtractEvent event) {
-        boolean isBlastFurnace = event.getBlock().getState() instanceof BlastFurnace;
-        boolean isFurnace = event.getBlock().getState() instanceof Furnace;
-
-        if (!isBlastFurnace && !isFurnace) {
+        if (!(event.getBlock().getState() instanceof Furnace)) {
             return;
         }
 
