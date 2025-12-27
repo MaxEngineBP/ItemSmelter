@@ -1,3 +1,35 @@
+// added debugger 1.4.5
+package com.itemsmelter.models;
+
+import java.util.Random;
+
+public class DurabilityRange {
+
+    private static final Random RANDOM = new Random();
+    private final int min;
+    private final int max;
+
+    public DurabilityRange(int min, int max) {
+        this.min = min;
+        this.max = max;
+    }
+
+    public int getRandom() {
+        if (min == max) {
+            return min;
+        }
+
+        int result = RANDOM.nextInt(max - min + 1) + min;
+
+        System.out.println("[DurabilityRange] min=" + min + " max=" + max + " -> result=" + result);
+
+        return result;
+    }
+
+    public int getMin() { return min; }
+    public int getMax() { return max; }
+}
+/* original code
 package com.itemsmelter.models;
 
 import java.util.Random;
@@ -22,4 +54,4 @@ public class DurabilityRange {
 
     public int getMin() { return min; }
     public int getMax() { return max; }
-}
+}*/
