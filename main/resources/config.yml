@@ -2,16 +2,17 @@
 # Full configuration for armor, tools, and minecart smelting in blast furnaces
 # TODO maked in 1.1.2 diamonds items cant burn in blast_furnace and usage default furnace
 # cant fix because ebal.
+# TODO maked in 1.4.3 maybe delete max_durability from all recipes and change it to in game values
 # Language: en_us (English), sru_sru (Russian) or ua_uk (Ukraine)
 language: en_us
 
 # Default items configuration
 default_items:
-  # === DIAMOND ARMOR ===
+  # === DIAMOND HELMET ===
   diamond_helmet:
     material: DIAMOND_HELMET
     enabled: true
-    smelt_in: FURNACE
+    smelt_in: BLAST_FURNACE
     ignore_sticks: true
     durability_based: true
     output:
@@ -31,11 +32,11 @@ default_items:
         min: 0
         max: 2
     smelt_time_multiplier: 3.0
-
+  # === DIAMOND CHESTPLATE ===
   diamond_chestplate:
     material: DIAMOND_CHESTPLATE
     enabled: true
-    smelt_in: FURNACE
+    smelt_in: BLAST_FURNACE
     ignore_sticks: true
     durability_based: true
     output:
@@ -55,11 +56,11 @@ default_items:
         min: 0
         max: 3
     smelt_time_multiplier: 3.0
-
+  # === DIAMOND LEGGINGS ===
   diamond_leggings:
     material: DIAMOND_LEGGINGS
     enabled: true
-    smelt_in: FURNACE
+    smelt_in: BLAST_FURNACE
     ignore_sticks: true
     durability_based: true
     output:
@@ -79,11 +80,11 @@ default_items:
         min: 0
         max: 3
     smelt_time_multiplier: 3.0
-
+  # === DIAMOND BOOTS ===
   diamond_boots:
     material: DIAMOND_BOOTS
     enabled: true
-    smelt_in: FURNACE
+    smelt_in: BLAST_FURNACE
     ignore_sticks: true
     durability_based: true
     output:
@@ -104,11 +105,11 @@ default_items:
         max: 1
     smelt_time_multiplier: 3.0
 
-  # === DIAMOND TOOLS ===
+  # === DIAMOND SWORD ===
   diamond_sword:
     material: DIAMOND_SWORD
     enabled: true
-    smelt_in: FURNACE
+    smelt_in: BLAST_FURNACE
     ignore_sticks: true
     durability_based: true
     output:
@@ -128,11 +129,11 @@ default_items:
         min: 0
         max: 1
     smelt_time_multiplier: 3.0
-
+  # === DIAMOND PICKAXE ===
   diamond_pickaxe:
     material: DIAMOND_PICKAXE
     enabled: true
-    smelt_in: FURNACE
+    smelt_in: BLAST_FURNACE
     ignore_sticks: true
     durability_based: true
     output:
@@ -152,11 +153,11 @@ default_items:
         min: 0
         max: 1
     smelt_time_multiplier: 3.0
-
+  # === DIAMOND AXE ===
   diamond_axe:
     material: DIAMOND_AXE
     enabled: true
-    smelt_in: FURNACE
+    smelt_in: BLAST_FURNACE
     ignore_sticks: true
     durability_based: true
     output:
@@ -176,11 +177,11 @@ default_items:
         min: 0
         max: 1
     smelt_time_multiplier: 3.0
-
+  # === DIAMOND SHOVEL ===
   diamond_shovel:
     material: DIAMOND_SHOVEL
     enabled: true
-    smelt_in: FURNACE
+    smelt_in: BLAST_FURNACE
     ignore_sticks: true
     durability_based: true
     output:
@@ -200,11 +201,11 @@ default_items:
         min: 0
         max: 0
     smelt_time_multiplier: 3.0
-
+  # === DIAMOND HOE ===
   diamond_hoe:
     material: DIAMOND_HOE
     enabled: true
-    smelt_in: FURNACE
+    smelt_in: BLAST_FURNACE
     ignore_sticks: true
     durability_based: true
     output:
@@ -225,7 +226,7 @@ default_items:
         max: 1
     smelt_time_multiplier: 3.0
 
-  # === IRON ARMOR ===
+  # === IRON HELMET ===
   iron_helmet:
     material: IRON_HELMET
     enabled: true
@@ -249,7 +250,7 @@ default_items:
         min: 0
         max: 2
     smelt_time_multiplier: 2.0
-
+  # === IRON CHESTPLATE ===
   iron_chestplate:
     material: IRON_CHESTPLATE
     enabled: true
@@ -273,7 +274,7 @@ default_items:
         min: 0
         max: 3
     smelt_time_multiplier: 2.0
-
+  # === IRON LEGGINGS ===
   iron_leggings:
     material: IRON_LEGGINGS
     enabled: true
@@ -297,7 +298,7 @@ default_items:
         min: 0
         max: 3
     smelt_time_multiplier: 2.0
-
+  # === IRON BOOTS ===
   iron_boots:
     material: IRON_BOOTS
     enabled: true
@@ -322,7 +323,7 @@ default_items:
         max: 1
     smelt_time_multiplier: 2.0
 
-  # === IRON TOOLS ===
+  # === IRON SWORD ===
   iron_sword:
     material: IRON_SWORD
     enabled: true
@@ -346,7 +347,7 @@ default_items:
         min: 0
         max: 1
     smelt_time_multiplier: 2.0
-
+  # === IRON PICKAXE ===
   iron_pickaxe:
     material: IRON_PICKAXE
     enabled: true
@@ -370,7 +371,7 @@ default_items:
         min: 0
         max: 1
     smelt_time_multiplier: 2.0
-
+  # === IRON AXE ===
   iron_axe:
     material: IRON_AXE
     enabled: true
@@ -394,7 +395,7 @@ default_items:
         min: 0
         max: 1
     smelt_time_multiplier: 2.0
-
+  # === IRON SHOVEL ===
   iron_shovel:
     material: IRON_SHOVEL
     enabled: true
@@ -418,7 +419,7 @@ default_items:
         min: 0
         max: 0
     smelt_time_multiplier: 2.0
-
+  # === IRON HOE ===
   iron_hoe:
     material: IRON_HOE
     enabled: true
@@ -443,7 +444,7 @@ default_items:
         max: 1
     smelt_time_multiplier: 2.0
 
-  # === GOLDEN ARMOR ===
+  # === GOLDEN HELMET ===
   golden_helmet:
     material: GOLDEN_HELMET
     enabled: true
@@ -467,7 +468,7 @@ default_items:
         min: 0
         max: 2
     smelt_time_multiplier: 2.5
-
+  # === GOLDEN CHESTPLATE ===
   golden_chestplate:
     material: GOLDEN_CHESTPLATE
     enabled: true
@@ -491,7 +492,7 @@ default_items:
         min: 0
         max: 3
     smelt_time_multiplier: 2.5
-
+  # === GOLDEN LEGGINGS ===
   golden_leggings:
     material: GOLDEN_LEGGINGS
     enabled: true
@@ -515,7 +516,7 @@ default_items:
         min: 0
         max: 3
     smelt_time_multiplier: 2.5
-
+  # === GOLDEN BOOTS ===
   golden_boots:
     material: GOLDEN_BOOTS
     enabled: true
@@ -540,7 +541,7 @@ default_items:
         max: 1
     smelt_time_multiplier: 2.5
 
-  # === GOLDEN TOOLS ===
+  # === GOLDEN SWORD ===
   golden_sword:
     material: GOLDEN_SWORD
     enabled: true
@@ -564,7 +565,7 @@ default_items:
         min: 0
         max: 1
     smelt_time_multiplier: 2.5
-
+  # === GOLDEN PICKAXE ===
   golden_pickaxe:
     material: GOLDEN_PICKAXE
     enabled: true
@@ -588,7 +589,7 @@ default_items:
         min: 0
         max: 1
     smelt_time_multiplier: 2.5
-
+  # === GOLDEN AXE ===
   golden_axe:
     material: GOLDEN_AXE
     enabled: true
@@ -612,7 +613,7 @@ default_items:
         min: 0
         max: 1
     smelt_time_multiplier: 2.5
-
+  # === GOLDEN SHOVEL ===
   golden_shovel:
     material: GOLDEN_SHOVEL
     enabled: true
@@ -636,7 +637,7 @@ default_items:
         min: 0
         max: 1
     smelt_time_multiplier: 2.5
-
+  # === GOLDEN HOE ===
   golden_hoe:
     material: GOLDEN_HOE
     enabled: true
@@ -661,7 +662,7 @@ default_items:
         max: 1
     smelt_time_multiplier: 2.5
 
-  # === CHAINMAIL ARMOR ===
+  # === CHAINMAIL HELMET ===
   chainmail_helmet:
     material: CHAINMAIL_HELMET
     enabled: true
@@ -685,7 +686,7 @@ default_items:
         min: 0
         max: 1
     smelt_time_multiplier: 2.0
-
+  # === CHAINMAIL CHESTPLATE ===
   chainmail_chestplate:
     material: CHAINMAIL_CHESTPLATE
     enabled: true
@@ -709,7 +710,7 @@ default_items:
         min: 0
         max: 2
     smelt_time_multiplier: 2.0
-
+  # === CHAINMAIL LEGGINGS ===
   chainmail_leggings:
     material: CHAINMAIL_LEGGINGS
     enabled: true
@@ -733,7 +734,7 @@ default_items:
         min: 0
         max: 1
     smelt_time_multiplier: 2.0
-
+  # === CHAINMAIL BOOTS ===
   chainmail_boots:
     material: CHAINMAIL_BOOTS
     enabled: true
@@ -758,7 +759,7 @@ default_items:
         max: 1
     smelt_time_multiplier: 2.0
 
-  # === MINECARTS ===
+  # === MINECART ===
   minecart:
     material: MINECART
     enabled: true
@@ -773,7 +774,7 @@ default_items:
         min: 1
         max: 2
     smelt_time_multiplier: 2.0
-
+  # === CHEST MINECART ===
   chest_minecart:
     material: CHEST_MINECART
     enabled: true
@@ -788,7 +789,9 @@ default_items:
         min: 1
         max: 2
     smelt_time_multiplier: 2.0
-
+  # === FURNACE MINECART ===
+  # ===   disabled   ===
+  # ===  test items  ===
   furnace_minecart:
     material: FURNACE_MINECART
     enabled: false
@@ -803,7 +806,9 @@ default_items:
         min: 1
         max: 2
     smelt_time_multiplier: 2.0
-
+  # === HOPPER MINECART ===
+  # ===   disabled   ===
+  # ===  test items  ===
   hopper_minecart:
     material: HOPPER_MINECART
     enabled: false
@@ -818,7 +823,9 @@ default_items:
         min: 1
         max: 4
     smelt_time_multiplier: 2.0
-
+  # === TNT MINECART ===
+  # ===   disabled   ===
+  # ===  test items  ===
   tnt_minecart:
     material: TNT_MINECART
     enabled: false
